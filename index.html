@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR AI Recruiting - Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1em;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: #667eea;
+        }
+
+        /* File upload */
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: #f0f0ff;
+            border-color: #5568d3;
+        }
+
+        .upload-area.dragging {
+            background: #e8eaf6;
+            border-color: #667eea;
+        }
+
+        .upload-area p {
+            color: #666;
+            margin: 10px 0;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Progress */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Candidates list */
+        .candidates-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .candidate-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .candidate-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateX(4px);
+        }
+
+        .candidate-info {
+            flex: 1;
+        }
+
+        .candidate-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .candidate-score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .score-badge.high {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .score-badge.medium {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+
+        .score-badge.low {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        /* Candidate detail */
+        .detail-view {
+            display: none;
+        }
+
+        .detail-view.active {
+            display: block;
+        }
+
+        .detail-header {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-header h2 {
+            margin-bottom: 12px;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .score-card {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .score-card-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .score-card-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .summary-section,
+        .red-flags-section,
+        .questions-section,
+        .notes-section {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ddd;
+        }
+
+        .summary-section {
+            border-left-color: #667eea;
+        }
+
+        .red-flags-section {
+            border-left-color: #f44336;
+        }
+
+        .questions-section {
+            border-left-color: #2196f3;
+        }
+
+        .notes-section {
+            border-left-color: #4caf50;
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .red-flag {
+            background: #ffebee;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            color: #c62828;
+            border-left: 3px solid #f44336;
+        }
+
+        .question-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border-left: 3px solid #2196f3;
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .ai-feedback {
+            background: #e3f2fd;
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid #2196f3;
+            margin-top: 20px;
+            color: #1565c0;
+            font-style: italic;
+        }
+
+        /* Status indicators */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-reviewed {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .status-pending {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons .btn {
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-button {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+
+            .scores-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .candidate-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .candidate-score {
+                margin-top: 12px;
+                text-align: left;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚀 HR AI Recruiting System</h1>
+        <p>Intelligent CV Ranking & Candidate Evaluation Prototype</p>
+    </header>
+
+    <div class="container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('setup')">1. Setup Role</button>
+            <button class="tab-button" onclick="showTab('upload')">2. Upload CVs</button>
+            <button class="tab-button" onclick="showTab('results')">3. Review Results</button>
+            <button class="tab-button" onclick="showTab('candidate')">4. Candidate Detail</button>
+        </div>
+
+        <!-- Tab 1: Setup Role -->
+        <div id="setup" class="tab-content active">
+            <div class="card">
+                <h2>Step 1: Create Job Role</h2>
+                <p>Fill in the job details below. The AI will suggest evaluation categories tailored to this role.</p>
+
+                <div class="form-group">
+                    <label for="jobTitle">Job Title *</label>
+                    <input type="text" id="jobTitle" placeholder="e.g., Senior Backend Engineer" value="Senior Backend Engineer">
+                </div>
+
+                <div class="form-group">
+                    <label for="jobDescription">Job Description *</label>
+                    <textarea id="jobDescription" placeholder="Paste the full job description here...">We're seeking a Senior Backend Engineer to lead our microservices architecture.
+
+Key Responsibilities:
+- Design and implement scalable backend systems
+- Lead technical architecture decisions
+- Mentor junior developers
+- Work with cloud infrastructure (AWS/Azure/GCP)
+
+Required Skills:
+- 5+ years backend development
+- Strong Python or Java experience
+- Database design and optimization
+- Microservices architecture knowledge
+- RESTful API design
+- AWS or Azure cloud platform
+
+Nice to Have:
+- Kubernetes/Docker experience
+- System design expertise
+- Team leadership experience</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="requiredSkills">Required Skills (comma-separated)</label>
+                    <input type="text" id="requiredSkills" placeholder="Python, Java, Microservices, REST APIs, AWS..." value="Python, Java, Microservices, REST APIs, AWS, Azure, Docker">
+                </div>
+
+                <button class="btn btn-primary" onclick="createRole()">
+                    📋 Create Role & Get AI Category Suggestions
+                </button>
+
+                <div id="roleSetupStatus" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- Suggested Categories -->
+            <div id="categorySuggestions"></div>
+        </div>
+
+        <!-- Tab 2: Upload CVs -->
+        <div id="upload" class="tab-content">
+            <div class="card">
+                <h2>Step 2: Upload Candidate CVs</h2>
+                <p>Upload PDF or Word documents. Process up to 30 CVs at once.</p>
+
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 2em; margin-bottom: 10px;">📄</div>
+                    <p><strong>Click to select</strong> or drag & drop CVs here</p>
+                    <p style="font-size: 0.9em; color: #999;">Supports PDF and Word documents</p>
+                </div>
+
+                <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx" onchange="handleFiles(event)">
+
+                <div id="selectedFiles" style="margin-top: 20px;"></div>
+
+                <button class="btn btn-primary" id="processBtn" onclick="processCVs()" style="margin-top: 20px; display: none;">
+                    🎯 Process All CVs
+                </button>
+
+                <div id="processingProgress" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Results -->
+        <div id="results" class="tab-content">
+            <div class="card">
+                <h2>Step 3: Review Results</h2>
+                <p>Click on any candidate to view detailed analysis.</p>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-secondary btn-sm" onclick="exportResults('csv')">📊 Export CSV</button>
+                    <button class="btn btn-secondary btn-sm" onclick="exportResults('json')">💾 Export JSON</button>
+                </div>
+            </div>
+
+            <div id="candidatesList" class="candidates-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>No candidates yet</h3>
+                    <p>Upload CVs and process them to see results here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Candidate Detail -->
+        <div id="candidate" class="tab-content">
+            <button class="btn btn-secondary" onclick="showTab('results')" style="margin-bottom: 20px;">← Back to Results</button>
+
+            <div id="candidateDetail" class="empty-state">
+                <div class="empty-state-icon">👤</div>
+                <h3>Select a candidate from the results</h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let storedRole = null;
+        let candidates = [];
+        let selectedCandidateId = null;
+        let selectedFiles = [];
+
+        // Tab management
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Create role
+        async function createRole() {
+            const title = document.getElementById('jobTitle').value;
+            const description = document.getElementById('jobDescription').value;
+            const requiredSkills = document.getElementById('requiredSkills').value;
+
+            if (!title || !description) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const statusDiv = document.getElementById('roleSetupStatus');
+            statusDiv.innerHTML = '<div class="spinner"></div><p>Creating role and generating AI category suggestions...</p>';
+
+            try {
+                const response = await fetch('/api/save-role', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        requiredSkills: requiredSkills.split(',').map(s => s.trim())
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error);
+                }
+
+                storedRole = data.role;
+                statusDiv.innerHTML = '';
+                displayCategorySuggestions(data.suggestions);
+
+                // Show next tab hint
+                setTimeout(() => {
+                    alert('✅ Role created! Now upload CVs in the "Upload CVs" tab to start the evaluation.');
+                    showTab('upload');
+                }, 1000);
+
+            } catch (error) {
+                statusDiv.innerHTML = `<div style="color: red; padding: 12px; background: #ffebee; border-radius: 6px;">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Display category suggestions
+        function displayCategorySuggestions(suggestions) {
+            const div = document.getElementById('categorySuggestions');
+            let html = '<div class="card"><h3>✨ AI-Suggested Categories</h3>';
+
+            html += '<h4 style="margin-top: 16px;">Main Categories:</h4>';
+            html += '<div style="margin-bottom: 16px;">';
+            suggestions.mainCategories.forEach(cat => {
+                html += `<div style="background: #f5f5f5; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                    <strong>${cat.name}</strong> (${cat.weight}%)<br>
+                    <span style="color: #666; font-size: 0.9em;">${cat.description}</span>
+                </div>`;
+            });
+            html += '</div>';
+
+            html += '<h4>Sub-Categories:</h4>';
+            html += '<div style="margin-bottom: 16px;">';
+            suggestions.subCategories.forEach(subcat => {
+                html += `<div style="background: #f9f9f9; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                    <strong>${subcat.name}</strong> (Related to: ${subcat.relatedToMain})<br>
+                    <span style="color: #666; font-size: 0.9em;">${subcat.description}</span>
+                </div>`;
+            });
+            html += '</div>';
+
+            html += `<p style="color: #999; font-style: italic;">The AI will use these categories to evaluate each candidate. You can modify them when needed.</p>
+                   </div>`;
+
+            div.innerHTML = html;
+        }
+
+        // File handling
+        const uploadArea = document.getElementById('uploadArea');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragging');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragging');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            const files = Array.from(e.dataTransfer.files);
+            selectedFiles = files.filter(f => f.type === 'application/pdf' || f.type.includes('wordprocessingml') || f.type.includes('word'));
+            displaySelectedFiles();
+        });
+
+        function handleFiles(event) {
+            selectedFiles = Array.from(event.target.files);
+            displaySelectedFiles();
+        }
+
+        function displaySelectedFiles() {
+            const div = document.getElementById('selectedFiles');
+            if (selectedFiles.length === 0) {
+                div.innerHTML = '';
+                document.getElementById('processBtn').style.display = 'none';
+                return;
+            }
+
+            let html = '<h3 style="margin-bottom: 12px;">📁 Selected Files (' + selectedFiles.length + ')</h3>';
+            html += '<div style="display: grid; gap: 8px;">';
+            selectedFiles.forEach((file, i) => {
+                html += `<div style="background: #f5f5f5; padding: 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>📄 ${file.name}</span>
+                    <span style="color: #999; font-size: 0.9em;">${(file.size / 1024).toFixed(1)} KB</span>
+                </div>`;
+            });
+            html += '</div>';
+
+            div.innerHTML = html;
+            document.getElementById('processBtn').style.display = 'block';
+        }
+
+        // Process CVs
+        async function processCVs() {
+            if (!storedRole) {
+                alert('Please create a role first!');
+                return;
+            }
+
+            if (selectedFiles.length === 0) {
+                alert('Please select CV files');
+                return;
+            }
+
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+
+            const progressDiv = document.getElementById('processingProgress');
+            progressDiv.innerHTML = '<div class="spinner"></div><p>Processing CVs...</p>';
+
+            try {
+                const response = await fetch('/api/process-cvs', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error);
+                }
+
+                candidates = data.candidates;
+                progressDiv.innerHTML = `<div style="background: #c8e6c9; padding: 12px; border-radius: 6px; color: #2e7d32;">✅ Processed ${data.candidatesCount} CVs successfully!</div>`;
+
+                setTimeout(() => {
+                    loadCandidates();
+                    showTab('results');
+                }, 1000);
+
+            } catch (error) {
+                progressDiv.innerHTML = `<div style="color: red; padding: 12px; background: #ffebee; border-radius: 6px;">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load candidates
+        async function loadCandidates() {
+            try {
+                const response = await fetch('/api/candidates');
+                const data = await response.json();
+                candidates = data.candidates;
+                displayCandidates();
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+            }
+        }
+
+        // Display candidates
+        function displayCandidates() {
+            const listDiv = document.getElementById('candidatesList');
+
+            if (candidates.length === 0) {
+                listDiv.innerHTML = `<div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>No candidates processed yet</h3>
+                    <p>Upload CVs and process them to see results here</p>
+                </div>`;
+                return;
+            }
+
+            // Sort by score
+            const sorted = [...candidates].sort((a, b) => b.overallScore - a.overallScore);
+
+            let html = '';
+            sorted.forEach((cand, i) => {
+                const scoreClass = cand.overallScore >= 75 ? 'high' : cand.overallScore >= 50 ? 'medium' : 'low';
+                html += `<div class="candidate-item" onclick="viewCandidate('${cand.id}')">
+                    <div class="candidate-info">
+                        <div class="candidate-name">${i + 1}. ${cand.filename}</div>
+                        <div style="margin-top: 8px;">
+                            ${Object.entries(cand.mainScores).map(([key, score]) =>
+                    `<span class="score-badge ${scoreClass}">${key}: ${score}</span>`
+                ).join('')}
+                        </div>
+                    </div>
+                    <div class="candidate-score">${cand.overallScore}</div>
+                </div>`;
+            });
+
+            listDiv.innerHTML = html;
+        }
+
+        // View candidate detail
+        async function viewCandidate(id) {
+            selectedCandidateId = id;
+
+            const detailDiv = document.getElementById('candidateDetail');
+            detailDiv.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                const response = await fetch(`/api/candidate/${id}`);
+                const data = await response.json();
+                const cand = data.candidate;
+
+                let html = `
+                    <div class="detail-header">
+                        <h2>${cand.filename}</h2>
+                        <div style="margin-top: 12px;">
+                            <span style="font-size: 2em; font-weight: bold; color: #667eea;">${cand.overallScore}</span>
+                            <span style="margin-left: 16px; font-size: 0.9em; color: #666;">
+                                ${cand.reviewed ? '<span class="status-badge status-reviewed">✅ Reviewed</span>' : '<span class="status-badge status-pending">⏳ Pending Review</span>'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="scores-grid">
+                        <div class="score-card">
+                            <div class="score-card-label">Overall Score</div>
+                            <div class="score-card-value">${cand.overallScore}</div>
+                        </div>
+                        ${Object.entries(cand.mainScores).map(([key, score]) =>
+                    `<div class="score-card">
+                            <div class="score-card-label">${key}</div>
+                            <div class="score-card-value">${score}</div>
+                        </div>`
+                ).join('')}
+                    </div>
+
+                    <div class="summary-section">
+                        <div class="section-title">📝 Summary</div>
+                        <p>${cand.summary}</p>
+                    </div>
+
+                    ${cand.redFlags.length > 0 ? `
+                    <div class="red-flags-section">
+                        <div class="section-title">⚠️ Red Flags</div>
+                        ${cand.redFlags.map(flag => `<div class="red-flag">${flag}</div>`).join('')}
+                    </div>
+                    ` : ''}
+
+                    <div class="questions-section">
+                        <div class="section-title">❓ Interview Questions (${cand.interviewQuestions.length})</div>
+                        ${cand.interviewQuestions.map((q, i) =>
+                    `<div class="question-item">
+                            <span class="question-number">Q${i + 1}:</span> ${q}
+                        </div>`
+                ).join('')}
+                    </div>
+
+                    <div class="ai-feedback">
+                        <div style="font-weight: 600; margin-bottom: 8px;">💭 AI Thoughts</div>
+                        ${cand.aiFeedback}
+                    </div>
+
+                    <div class="notes-section">
+                        <div class="section-title">📋 Interview Notes</div>
+                        <textarea id="interviewNotes" placeholder="Add notes from the interview..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; min-height: 100px;">${cand.interviewNotes || ''}</textarea>
+                        <button class="btn btn-primary" onclick="saveInterviewNotes('${id}')" style="margin-top: 12px;">💾 Save Notes</button>
+
+                        ${cand.recalibratedScore ? `
+                        <div style="background: #e8f5e9; padding: 16px; border-radius: 6px; margin-top: 16px; border-left: 4px solid #4caf50;">
+                            <div style="font-weight: 600; color: #2e7d32; margin-bottom: 8px;">✅ Recalibrated After Interview</div>
+                            <div style="color: #2e7d32;">
+                                <strong>New Score:</strong> ${cand.recalibratedScore.recalibratedScore}/100<br>
+                                <strong>Adjustment:</strong> ${cand.recalibratedScore.scoreAdjustment > 0 ? '+' : ''}${cand.recalibratedScore.scoreAdjustment}<br>
+                                <strong>Reason:</strong> ${cand.recalibratedScore.adjustmentReason}<br>
+                                <strong>Assessment:</strong> ${cand.recalibratedScore.overallAssessment}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="markReviewed('${id}')">✅ Mark as Reviewed</button>
+                        <button class="btn btn-secondary" onclick="showTab('results')">← Back</button>
+                    </div>
+                `;
+
+                detailDiv.innerHTML = html;
+                showTab('candidate');
+
+            } catch (error) {
+                detailDiv.innerHTML = `<div style="color: red; padding: 12px; background: #ffebee; border-radius: 6px;">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Mark as reviewed
+        async function markReviewed(id) {
+            try {
+                const response = await fetch(`/api/candidate/${id}/review`, { method: 'POST' });
+                if (response.ok) {
+                    alert('✅ Marked as reviewed');
+                    viewCandidate(id);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Save interview notes
+        async function saveInterviewNotes(id) {
+            const notes = document.getElementById('interviewNotes').value;
+
+            if (!notes) {
+                alert('Please add interview notes');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/candidate/${id}/notes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notes })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('✅ Notes saved and score recalibrated!');
+                    viewCandidate(id);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Export results
+        function exportResults(format) {
+            window.location.href = `/api/export/${format}`;
+        }
+
+        // Load existing candidates on page load
+        loadCandidates();
+    </script>
+</body>
+</html>
